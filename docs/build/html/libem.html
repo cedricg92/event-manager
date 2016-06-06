@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Event Manager libraries &mdash; Event-Manager 0.0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Event-Manager 0.0.1 documentation" href="index.html"/>
+        <link rel="prev" title="Welcome to Event-Manager’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Event-Manager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Event Manager libraries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-em.handler">Handler Library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-em.event">Event Library</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Event-Manager</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Event Manager libraries</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/libem.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="event-manager-libraries">
+<h1>Event Manager libraries<a class="headerlink" href="#event-manager-libraries" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-em.handler">
+<span id="handler-library"></span><h2>Handler Library<a class="headerlink" href="#module-em.handler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="em.handler.ExecHandler">
+<em class="property">class </em><code class="descclassname">em.handler.</code><code class="descname">ExecHandler</code><span class="sig-paren">(</span><em>event_conf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#ExecHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.ExecHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">watchdog.events.PatternMatchingEventHandler</span></code></p>
+<p>Class ExecHandler</p>
+<dl class="method">
+<dt id="em.handler.ExecHandler.check_schedule">
+<code class="descname">check_schedule</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#ExecHandler.check_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.ExecHandler.check_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event should be launched</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>now</strong> (<em>datetime.datetime</em>) &#8211; Actual date and time</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the event should be launched</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.ExecHandler.is_scheduled">
+<code class="descname">is_scheduled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#ExecHandler.is_scheduled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.ExecHandler.is_scheduled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event handler is scheduled</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the event handler is scheduled</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.ExecHandler.on_created">
+<code class="descname">on_created</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#ExecHandler.on_created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.ExecHandler.on_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function called when file is created</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileCreatedEvent</em>) &#8211; File created event</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.ExecHandler.on_modified">
+<code class="descname">on_modified</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#ExecHandler.on_modified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.ExecHandler.on_modified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function called  when file is modified</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileModifiedEvent</em>) &#8211; File modified event</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.ExecHandler.on_moved">
+<code class="descname">on_moved</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#ExecHandler.on_moved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.ExecHandler.on_moved" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function called when file is moved</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileMovedEvent</em>) &#8211; File moved event</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.ExecHandler.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#ExecHandler.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.ExecHandler.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function process</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileSystemEvent</em>) &#8211; Event file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Return value (True success, False error)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="em.handler.FsHandler">
+<em class="property">class </em><code class="descclassname">em.handler.</code><code class="descname">FsHandler</code><span class="sig-paren">(</span><em>event_conf</em>, <em>fs_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">watchdog.events.PatternMatchingEventHandler</span></code></p>
+<p>File System Handler</p>
+<dl class="method">
+<dt id="em.handler.FsHandler.check_schedule">
+<code class="descname">check_schedule</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.check_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.check_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event should be launched</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>now</strong> (<em>datetime.datetime</em>) &#8211; Actual date and time</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the event should be launched</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.is_scheduled">
+<code class="descname">is_scheduled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.is_scheduled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.is_scheduled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event handler is scheduled</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the event handler is scheduled</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.on_created">
+<code class="descname">on_created</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.on_created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.on_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler listener on creation of file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileCreatedEvent</em>) &#8211; File created event</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.on_modified">
+<code class="descname">on_modified</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.on_modified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.on_modified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler listener on modification of file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileModifiedEvent</em>) &#8211; File modified event</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.on_moved">
+<code class="descname">on_moved</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.on_moved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.on_moved" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler listener on move of file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileMovedEvent</em>) &#8211; File moved event</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>full_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function process</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_filename</strong> (<em>str</em>) &#8211; Full path of filename</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.process_archive">
+<code class="descname">process_archive</code><span class="sig-paren">(</span><em>filename</em>, <em>extension</em>, <em>tmp_extension</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.process_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.process_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create archive file (tar)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) &#8211; Filename</li>
+<li><strong>extension</strong> (<em>str</em>) &#8211; Extension of file (run)</li>
+<li><strong>tmp_extension</strong> (<em>str</em>) &#8211; Tmp extension</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the process run correctly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.process_compress">
+<code class="descname">process_compress</code><span class="sig-paren">(</span><em>filename</em>, <em>extension</em>, <em>tmp_extension</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.process_compress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.process_compress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compress file (gzip)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) &#8211; Filename</li>
+<li><strong>extension</strong> (<em>str</em>) &#8211; Extension of file (run)</li>
+<li><strong>tmp_extension</strong> (<em>str</em>) &#8211; Tmp extension</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the process run correctly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.process_move">
+<code class="descname">process_move</code><span class="sig-paren">(</span><em>filename</em>, <em>extension</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.process_move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.process_move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move file to destination
+directory -&gt; File -&gt; destination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) &#8211; Filename</li>
+<li><strong>extension</strong> (<em>str</em>) &#8211; Extention of file (run)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the process run correctly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.process_unarchive">
+<code class="descname">process_unarchive</code><span class="sig-paren">(</span><em>filename</em>, <em>extension</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.process_unarchive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.process_unarchive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unarchive file (untar)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) &#8211; Filename</li>
+<li><strong>extension</strong> (<em>str</em>) &#8211; Extension of file (run)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the process run correctly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.process_uncompress">
+<code class="descname">process_uncompress</code><span class="sig-paren">(</span><em>filename</em>, <em>extension</em>, <em>tmp_extension</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.process_uncompress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.process_uncompress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uncompress file (gunzip)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) &#8211; Filename</li>
+<li><strong>extension</strong> (<em>str</em>) &#8211; Extension of file (run)</li>
+<li><strong>tmp_extension</strong> (<em>str</em>) &#8211; Tmp extension</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the process run correctly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.FsHandler.run_schedule">
+<code class="descname">run_schedule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#FsHandler.run_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.FsHandler.run_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run scheduled event</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="em.handler.HDFSHandler">
+<em class="property">class </em><code class="descclassname">em.handler.</code><code class="descname">HDFSHandler</code><span class="sig-paren">(</span><em>event_conf</em>, <em>hdfs_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">watchdog.events.PatternMatchingEventHandler</span></code></p>
+<p>HDFS handler</p>
+<dl class="method">
+<dt id="em.handler.HDFSHandler.check_schedule">
+<code class="descname">check_schedule</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.check_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.check_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event should be launched</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>now</strong> (<em>datetime.datetime</em>) &#8211; Actual date and time</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the event should be launched</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.is_scheduled">
+<code class="descname">is_scheduled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.is_scheduled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.is_scheduled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event handler is scheduled</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the event handler is scheduled</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.on_created">
+<code class="descname">on_created</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.on_created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.on_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler listener on creation of file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileCreatedEvent</em>) &#8211; File created event</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.on_modified">
+<code class="descname">on_modified</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.on_modified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.on_modified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler listener on modification of file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileModifiedEvent</em>) &#8211; File modified event</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.on_moved">
+<code class="descname">on_moved</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.on_moved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.on_moved" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler listener on move of file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> (<em>FileMovedEvent</em>) &#8211; File moved event</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>full_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function process</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>full_filename</strong> (<em>str</em>) &#8211; Full path of filename</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.process_get">
+<code class="descname">process_get</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.process_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.process_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get file from HDFS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; Filename</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the process run correctly</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.process_put">
+<code class="descname">process_put</code><span class="sig-paren">(</span><em>filename</em>, <em>extension</em>, <em>err_extension</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.process_put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.process_put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put file to HDFS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>str</em>) &#8211; Filename</li>
+<li><strong>extension</strong> (<em>str</em>) &#8211; extension of file (run)</li>
+<li><strong>err_extension</strong> (<em>str</em>) &#8211; error extension (err)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the process run correctly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.handler.HDFSHandler.run_schedule">
+<code class="descname">run_schedule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#HDFSHandler.run_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.HDFSHandler.run_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run scheduled event</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="em.handler.add_log">
+<code class="descclassname">em.handler.</code><code class="descname">add_log</code><span class="sig-paren">(</span><em>log_pattern</em>, <em>event</em>, <em>filename</em>, <em>destination</em>, <em>event_type</em>, <em>event_subtype</em>, <em>exec_program</em>, <em>args</em>, <em>return_val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#add_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.add_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add log in filelog</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>log_pattern</strong> (<em>str</em>) &#8211; Pattern of log</li>
+<li><strong>event</strong> &#8211; Event Name</li>
+<li><strong>filename</strong> &#8211; File name</li>
+<li><strong>destination</strong> &#8211; Destination</li>
+<li><strong>event_type</strong> &#8211; Event type</li>
+<li><strong>event_subtype</strong> &#8211; Event sub type</li>
+<li><strong>exec_program</strong> &#8211; executable</li>
+<li><strong>args</strong> &#8211; Arguments</li>
+<li><strong>return_val</strong> &#8211; Return Value</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="em.handler.add_log_str">
+<code class="descclassname">em.handler.</code><code class="descname">add_log_str</code><span class="sig-paren">(</span><em>log_pattern</em>, <em>strlog</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/handler.html#add_log_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.handler.add_log_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add log in logfile</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>log_pattern</strong> (<em>str</em>) &#8211; Pattern of log</li>
+<li><strong>strlog</strong> (<em>str</em>) &#8211; Log message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-em.event">
+<span id="event-library"></span><h2>Event Library<a class="headerlink" href="#module-em.event" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="em.event.EventConf">
+<em class="property">class </em><code class="descclassname">em.event.</code><code class="descname">EventConf</code><span class="sig-paren">(</span><em>enabled</em>, <em>name</em>, <em>event_type</em>, <em>subtype</em>, <em>directory</em>, <em>patterns</em>, <em>destination</em>, <em>context</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/event.html#EventConf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.event.EventConf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configuration of Event</p>
+<dl class="method">
+<dt id="em.event.EventConf.is_fs_directory">
+<code class="descname">is_fs_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/event.html#EventConf.is_fs_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.event.EventConf.is_fs_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event use a linux fs directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the event use a linux fs directory</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="em.event.EventConf.is_scheduled">
+<code class="descname">is_scheduled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/event.html#EventConf.is_scheduled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.event.EventConf.is_scheduled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event is scheduled</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the event is cheduled</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="em.event.EventLoader">
+<em class="property">class </em><code class="descclassname">em.event.</code><code class="descname">EventLoader</code><a class="reference internal" href="_modules/em/event.html#EventLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.event.EventLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Events Loader</p>
+<dl class="staticmethod">
+<dt id="em.event.EventLoader.load_event_from_json">
+<em class="property">static </em><code class="descname">load_event_from_json</code><span class="sig-paren">(</span><em>json_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em/event.html#EventLoader.load_event_from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em.event.EventLoader.load_event_from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load events from Json</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>json_file</strong> (<em>str</em>) &#8211; Filename of json</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of Events</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict of EventConf</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Event-Manager’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Cedric GUADALUPE.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

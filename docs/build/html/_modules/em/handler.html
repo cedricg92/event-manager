@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>em.handler &mdash; Event-Manager 0.0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Event-Manager 0.0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Event-Manager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../libem.html">Event Manager libraries</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">Event-Manager</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>em.handler</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for em.handler</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">croniter</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">hdfs</span>
+<span class="kn">from</span> <span class="nn">watchdog.events</span> <span class="kn">import</span> <span class="n">PatternMatchingEventHandler</span><span class="p">,</span> <span class="n">FileCreatedEvent</span><span class="p">,</span> <span class="n">FileModifiedEvent</span><span class="p">,</span> <span class="n">FileMovedEvent</span><span class="p">,</span> <span class="n">os</span><span class="p">,</span> \
+    <span class="n">FileSystemEvent</span>
+
+
+<div class="viewcode-block" id="add_log_str"><a class="viewcode-back" href="../../libem.html#em.handler.add_log_str">[docs]</a><span class="k">def</span> <span class="nf">add_log_str</span><span class="p">(</span><span class="n">log_pattern</span><span class="p">,</span> <span class="n">strlog</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add log in logfile</span>
+
+<span class="sd">    :param log_pattern: Pattern of log</span>
+<span class="sd">    :type log_pattern: str</span>
+<span class="sd">    :param strlog: Log message</span>
+<span class="sd">    :type strlog: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">log_pattern</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">logfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%Y&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y&quot;</span><span class="p">))</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">logfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%m&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%m&quot;</span><span class="p">))</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">logfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">logfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%H&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H&quot;</span><span class="p">))</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">logfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%M&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M&quot;</span><span class="p">))</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">logfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;%S&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%S&quot;</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">logfile</span><span class="p">,</span> <span class="s2">&quot;ab+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myfile</span><span class="p">:</span>
+        <span class="n">myfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">strlog</span><span class="p">)</span>
+        <span class="n">myfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="add_log"><a class="viewcode-back" href="../../libem.html#em.handler.add_log">[docs]</a><span class="k">def</span> <span class="nf">add_log</span><span class="p">(</span><span class="n">log_pattern</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">event_subtype</span><span class="p">,</span> <span class="n">exec_program</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add log in filelog</span>
+
+<span class="sd">    :param log_pattern: Pattern of log</span>
+<span class="sd">    :type log_pattern: str</span>
+<span class="sd">    :param event: Event Name</span>
+<span class="sd">    :param filename: File name</span>
+<span class="sd">    :param destination: Destination</span>
+<span class="sd">    :param event_type: Event type</span>
+<span class="sd">    :param event_subtype: Event sub type</span>
+<span class="sd">    :param exec_program: executable</span>
+<span class="sd">    :param args: Arguments</span>
+<span class="sd">    :param return_val: Return Value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">event_type</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">event_subtype</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">exec_program</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_val</span><span class="p">:</span>
+        <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span> <span class="o">+=</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span>
+    <span class="n">add_log_str</span><span class="p">(</span><span class="n">log_pattern</span><span class="p">,</span> <span class="n">log</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExecHandler"><a class="viewcode-back" href="../../libem.html#em.handler.ExecHandler">[docs]</a><span class="k">class</span> <span class="nc">ExecHandler</span><span class="p">(</span><span class="n">PatternMatchingEventHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class ExecHandler</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FILE_LOG</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_conf</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param event_conf: EventConf</span>
+<span class="sd">        :type event_conf: em.event.EventConf</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">([</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;*.err&quot;</span><span class="p">],</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_patterns</span> <span class="o">=</span> <span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span> <span class="o">=</span> <span class="n">event_conf</span>
+
+<div class="viewcode-block" id="ExecHandler.is_scheduled"><a class="viewcode-back" href="../../libem.html#em.handler.ExecHandler.is_scheduled">[docs]</a>    <span class="k">def</span> <span class="nf">is_scheduled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event handler is scheduled</span>
+
+<span class="sd">        :return: True if the event handler is scheduled</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">is_scheduled</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExecHandler.on_created"><a class="viewcode-back" href="../../libem.html#em.handler.ExecHandler.on_created">[docs]</a>    <span class="k">def</span> <span class="nf">on_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function called when file is created</span>
+
+<span class="sd">        :param event: File created event</span>
+<span class="sd">        :type event: FileCreatedEvent</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileCreatedEvent</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExecHandler.on_modified"><a class="viewcode-back" href="../../libem.html#em.handler.ExecHandler.on_modified">[docs]</a>    <span class="k">def</span> <span class="nf">on_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function called  when file is modified</span>
+
+<span class="sd">        :param event: File modified event</span>
+<span class="sd">        :type event: FileModifiedEvent</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileModifiedEvent</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExecHandler.on_moved"><a class="viewcode-back" href="../../libem.html#em.handler.ExecHandler.on_moved">[docs]</a>    <span class="k">def</span> <span class="nf">on_moved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function called when file is moved</span>
+
+<span class="sd">        :param event: File moved event</span>
+<span class="sd">        :type event: FileMovedEvent</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileMovedEvent</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExecHandler.process"><a class="viewcode-back" href="../../libem.html#em.handler.ExecHandler.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function process</span>
+
+<span class="sd">        :param event: Event file</span>
+<span class="sd">        :type event: FileSystemEvent</span>
+<span class="sd">        :return: Return value (True success, False error)</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">enabled</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;execArgs&quot;</span><span class="p">))</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2">ilenale&quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">estination&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
+        <span class="n">exec_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;execProgram&quot;</span><span class="p">))</span>
+        <span class="n">exec_app</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;execProgram&quot;</span><span class="p">))</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;cd &quot;</span><span class="o">+</span><span class="n">exec_dir</span><span class="o">+</span><span class="s2">&quot;;./&quot;</span><span class="o">+</span><span class="n">exec_app</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">add_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILE_LOG</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">subtype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;execProgram&quot;</span><span class="p">),</span> <span class="n">args</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">src_path</span> <span class="o">+</span> <span class="s2">&quot;.err&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="ExecHandler.check_schedule"><a class="viewcode-back" href="../../libem.html#em.handler.ExecHandler.check_schedule">[docs]</a>    <span class="k">def</span> <span class="nf">check_schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event should be launched</span>
+
+<span class="sd">        :param now: Actual date and time</span>
+<span class="sd">        :type now: datetime.datetime</span>
+<span class="sd">        :return: True if the event should be launched</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cron</span> <span class="o">=</span> <span class="n">croniter</span><span class="o">.</span><span class="n">croniter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_cron</span><span class="p">(),</span> <span class="n">now</span><span class="p">)</span>
+        <span class="n">current_exec_datetime</span> <span class="o">=</span> <span class="n">cron</span><span class="o">.</span><span class="n">get_current</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">year</span> <span class="ow">and</span> <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span> <span class="ow">and</span>
+                <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">day</span> <span class="ow">and</span> <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">hour</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">hour</span> <span class="ow">and</span>
+                <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">minute</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FsHandler"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler">[docs]</a><span class="k">class</span> <span class="nc">FsHandler</span><span class="p">(</span><span class="n">PatternMatchingEventHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;File System Handler</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">FILE_LOG</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">TYPE_MOVE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">TYPE_ARCHIVE</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">TYPE_COMPRESS</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">TYPE_UNARCHIVE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">TYPE_UNCOMPRESS</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">STR_TYPE_MOVE</span> <span class="o">=</span> <span class="s2">&quot;move&quot;</span>
+    <span class="n">STR_TYPE_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;archive&quot;</span>
+    <span class="n">STR_TYPE_COMPRESS</span> <span class="o">=</span> <span class="s2">&quot;compress&quot;</span>
+    <span class="n">STR_TYPE_UNARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;unarchive&quot;</span>
+    <span class="n">STR_TYPE_UNCOMPRESS</span> <span class="o">=</span> <span class="s2">&quot;uncompress&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_conf</span><span class="p">,</span> <span class="n">fs_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param event_conf: ExecConf</span>
+<span class="sd">        :type event_conf: em.event.EventConf</span>
+<span class="sd">        :param fs_type: Process type of Fs handler</span>
+<span class="sd">        :type fs_type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">([</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;*.tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;*.err&quot;</span><span class="p">,</span> <span class="s2">&quot;*.run&quot;</span><span class="p">],</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span> <span class="o">=</span> <span class="n">event_conf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">=</span> <span class="n">fs_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
+
+<div class="viewcode-block" id="FsHandler.is_scheduled"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.is_scheduled">[docs]</a>    <span class="k">def</span> <span class="nf">is_scheduled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event handler is scheduled</span>
+
+<span class="sd">        :return: True if the event handler is scheduled</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">is_scheduled</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">on_any_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.tmp&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">),</span> <span class="n">pattern</span><span class="p">):</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FsHandler.on_created"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.on_created">[docs]</a>    <span class="k">def</span> <span class="nf">on_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handler listener on creation of file</span>
+
+<span class="sd">        :param event: File created event</span>
+<span class="sd">        :type event: FileCreatedEvent</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileCreatedEvent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="FsHandler.on_modified"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.on_modified">[docs]</a>    <span class="k">def</span> <span class="nf">on_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handler listener on modification of file</span>
+
+<span class="sd">        :param event: File modified event</span>
+<span class="sd">        :type event: FileModifiedEvent</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileModifiedEvent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="FsHandler.on_moved"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.on_moved">[docs]</a>    <span class="k">def</span> <span class="nf">on_moved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handler listener on move of file</span>
+
+<span class="sd">        :param event: File moved event</span>
+<span class="sd">        :type event: FileMovedEvent</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileMovedEvent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">dest_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="FsHandler.process"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function process</span>
+
+<span class="sd">        :param full_filename: Full path of filename</span>
+<span class="sd">        :type full_filename: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">enabled</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">full_filename</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">full_filename</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">full_filename</span><span class="p">)</span>
+        <span class="n">matched</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matched</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">full_filename</span><span class="p">,</span> <span class="n">full_filename</span> <span class="o">+</span> <span class="s2">&quot;.run&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">TYPE_MOVE</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">STR_TYPE_MOVE</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_move</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">TYPE_ARCHIVE</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">STR_TYPE_ARCHIVE</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_archive</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">TYPE_COMPRESS</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">STR_TYPE_COMPRESS</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_compress</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">TYPE_UNCOMPRESS</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">STR_TYPE_UNCOMPRESS</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_uncompress</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">TYPE_UNARCHIVE</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_type</span> <span class="o">==</span> <span class="n">FsHandler</span><span class="o">.</span><span class="n">STR_TYPE_UNARCHIVE</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_unarchive</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">)</span>
+        <span class="n">add_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILE_LOG</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">full_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">subtype</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">full_filename</span> <span class="o">+</span> <span class="s2">&quot;.run&quot;</span><span class="p">,</span> <span class="n">full_filename</span> <span class="o">+</span> <span class="s2">&quot;.err&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="FsHandler.process_move"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.process_move">[docs]</a>    <span class="k">def</span> <span class="nf">process_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move file to destination</span>
+<span class="sd">        directory -&gt; File -&gt; destination</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param extension: Extention of file (run)</span>
+<span class="sd">        :type extension: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FsHandler.process_archive"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.process_archive">[docs]</a>    <span class="k">def</span> <span class="nf">process_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">,</span> <span class="n">tmp_extension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create archive file (tar)</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param extension: Extension of file (run)</span>
+<span class="sd">        :type extension: str</span>
+<span class="sd">        :param tmp_extension: Tmp extension</span>
+<span class="sd">        :type tmp_extension: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span><span class="p">)</span>
+        <span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.tar&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FsHandler.process_compress"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.process_compress">[docs]</a>    <span class="k">def</span> <span class="nf">process_compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">,</span> <span class="n">tmp_extension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compress file (gzip)</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param extension: Extension of file (run)</span>
+<span class="sd">        :type extension: str</span>
+<span class="sd">        :param tmp_extension: Tmp extension</span>
+<span class="sd">        :type tmp_extension: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_in</span><span class="p">,</span> \
+                <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">,</span>
+                          <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_out</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">f_in</span><span class="p">,</span> <span class="n">f_out</span><span class="p">)</span>
+            <span class="n">f_in</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">f_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FsHandler.process_uncompress"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.process_uncompress">[docs]</a>    <span class="k">def</span> <span class="nf">process_uncompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">,</span> <span class="n">tmp_extension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Uncompress file (gunzip)</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param extension: Extension of file (run)</span>
+<span class="sd">        :type extension: str</span>
+<span class="sd">        :param tmp_extension: Tmp extension</span>
+<span class="sd">        :type tmp_extension: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span>
+                          <span class="n">tmp_extension</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_in</span><span class="p">,</span> \
+                <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">,</span>
+                     <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_out</span><span class="p">:</span>
+            <span class="n">f_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f_in</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tmp_extension</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="FsHandler.process_unarchive"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.process_unarchive">[docs]</a>    <span class="k">def</span> <span class="nf">process_unarchive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unarchive file (untar)</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param extension: Extension of file (run)</span>
+<span class="sd">        :type extension: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+            <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
+            <span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="FsHandler.run_schedule"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.run_schedule">[docs]</a>    <span class="k">def</span> <span class="nf">run_schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run scheduled event</span>
+
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+                    <span class="nb">exit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="p">))</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FsHandler.check_schedule"><a class="viewcode-back" href="../../libem.html#em.handler.FsHandler.check_schedule">[docs]</a>    <span class="k">def</span> <span class="nf">check_schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event should be launched</span>
+
+<span class="sd">        :param now: Actual date and time</span>
+<span class="sd">        :type now: datetime.datetime</span>
+<span class="sd">        :return: True if the event should be launched</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cron</span> <span class="o">=</span> <span class="n">croniter</span><span class="o">.</span><span class="n">croniter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_cron</span><span class="p">(),</span> <span class="n">now</span><span class="p">)</span>
+        <span class="n">current_exec_datetime</span> <span class="o">=</span> <span class="n">cron</span><span class="o">.</span><span class="n">get_current</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">year</span> <span class="ow">and</span> <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span> <span class="ow">and</span>
+                <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">day</span> <span class="ow">and</span> <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">hour</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">hour</span> <span class="ow">and</span>
+                <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">minute</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HDFSHandler"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler">[docs]</a><span class="k">class</span> <span class="nc">HDFSHandler</span><span class="p">(</span><span class="n">PatternMatchingEventHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;HDFS handler</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FILE_LOG</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">TYPE_PUT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">TYPE_GET</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">STR_TYPE_PUT</span> <span class="o">=</span> <span class="s2">&quot;put&quot;</span>
+    <span class="n">STR_TYPE_GET</span> <span class="o">=</span> <span class="s2">&quot;get&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_conf</span><span class="p">,</span> <span class="n">hdfs_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param self:</span>
+<span class="sd">        :param event_conf: ExecConf</span>
+<span class="sd">        :type event_conf: em.event.EventConf</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">([</span><span class="s2">&quot;*&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;*.tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;*.err&quot;</span><span class="p">,</span> <span class="s2">&quot;*.run&quot;</span><span class="p">],</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span> <span class="o">=</span> <span class="n">event_conf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdfs_type</span> <span class="o">=</span> <span class="n">hdfs_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
+
+<div class="viewcode-block" id="HDFSHandler.is_scheduled"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.is_scheduled">[docs]</a>    <span class="k">def</span> <span class="nf">is_scheduled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event handler is scheduled</span>
+
+<span class="sd">        :return: True if the event handler is scheduled</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">is_scheduled</span><span class="p">()</span> <span class="ow">and</span>\
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STR_TYPE_GET</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_GET</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;HDFSHandler: Subtype error - get should be scheduled !&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">is_scheduled</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">on_any_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;.tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;.err&quot;</span><span class="p">,</span> <span class="s2">&quot;.run&quot;</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">),</span> <span class="n">pattern</span><span class="p">):</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HDFSHandler.on_created"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.on_created">[docs]</a>    <span class="k">def</span> <span class="nf">on_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handler listener on creation of file</span>
+
+<span class="sd">        :param event: File created event</span>
+<span class="sd">        :type event: FileCreatedEvent</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileCreatedEvent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="HDFSHandler.on_modified"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.on_modified">[docs]</a>    <span class="k">def</span> <span class="nf">on_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handler listener on modification of file</span>
+
+<span class="sd">        :param event: File modified event</span>
+<span class="sd">        :type event: FileModifiedEvent</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileModifiedEvent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="HDFSHandler.on_moved"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.on_moved">[docs]</a>    <span class="k">def</span> <span class="nf">on_moved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handler listener on move of file</span>
+
+<span class="sd">        :param event: File moved event</span>
+<span class="sd">        :type event: FileMovedEvent</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">FileMovedEvent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">dest_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="HDFSHandler.process"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Function process</span>
+
+<span class="sd">        :param full_filename: Full path of filename</span>
+<span class="sd">        :type full_filename: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">enabled</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">full_filename</span><span class="p">)</span>
+        <span class="n">matched</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matched</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">is_fs_directory</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">full_filename</span><span class="p">,</span> <span class="n">full_filename</span> <span class="o">+</span> <span class="s2">&quot;.run&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdfs_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_PUT</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdfs_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STR_TYPE_PUT</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_put</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;err&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdfs_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_GET</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdfs_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STR_TYPE_GET</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_get</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">add_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILE_LOG</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">full_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">subtype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUrl&quot;</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUser&quot;</span><span class="p">),</span> <span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="HDFSHandler.process_put"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.process_put">[docs]</a>    <span class="k">def</span> <span class="nf">process_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">,</span> <span class="n">err_extension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Put file to HDFS</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param extension: extension of file (run)</span>
+<span class="sd">        :type extension: str</span>
+<span class="sd">        :param err_extension: error extension (err)</span>
+<span class="sd">        :type err_extension: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">hdfs</span><span class="o">.</span><span class="n">InsecureClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUrl&quot;</span><span class="p">),</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUser&quot;</span><span class="p">))</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">upload</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">err_extension</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="HDFSHandler.process_get"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.process_get">[docs]</a>    <span class="k">def</span> <span class="nf">process_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get file from HDFS</span>
+
+<span class="sd">        :param filename: Filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :return: True if the process run correctly</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">hdfs</span><span class="o">.</span><span class="n">InsecureClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUrl&quot;</span><span class="p">),</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUser&quot;</span><span class="p">))</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">res</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">destination</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span>
+                          <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="HDFSHandler.run_schedule"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.run_schedule">[docs]</a>    <span class="k">def</span> <span class="nf">run_schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run scheduled event</span>
+
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STR_TYPE_GET</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_GET</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">hdfs</span><span class="o">.</span><span class="n">InsecureClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUrl&quot;</span><span class="p">),</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;hdfsUser&quot;</span><span class="p">))</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+                        <span class="nb">exit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+                        <span class="nb">exit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">directory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="n">filename</span><span class="p">))</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HDFSHandler.check_schedule"><a class="viewcode-back" href="../../libem.html#em.handler.HDFSHandler.check_schedule">[docs]</a>    <span class="k">def</span> <span class="nf">check_schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event should be launched</span>
+
+<span class="sd">        :param now: Actual date and time</span>
+<span class="sd">        :type now: datetime.datetime</span>
+<span class="sd">        :return: True if the event should be launched</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cron</span> <span class="o">=</span> <span class="n">croniter</span><span class="o">.</span><span class="n">croniter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_conf</span><span class="o">.</span><span class="n">get_cron</span><span class="p">(),</span> <span class="n">now</span><span class="p">)</span>
+        <span class="n">current_exec_datetime</span> <span class="o">=</span> <span class="n">cron</span><span class="o">.</span><span class="n">get_current</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">year</span> <span class="ow">and</span> <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span> <span class="ow">and</span>
+                <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">day</span> <span class="ow">and</span> <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">hour</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">hour</span> <span class="ow">and</span>
+                <span class="n">current_exec_datetime</span><span class="o">.</span><span class="n">minute</span> <span class="o">==</span> <span class="n">now</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Cedric GUADALUPE.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

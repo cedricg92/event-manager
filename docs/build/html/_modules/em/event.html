@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>em.event &mdash; Event-Manager 0.0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Event-Manager 0.0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Event-Manager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../libem.html">Event Manager libraries</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">Event-Manager</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>em.event</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for em.event</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">em.handler</span> <span class="kn">import</span> <span class="n">HDFSHandler</span>
+
+
+<div class="viewcode-block" id="EventConf"><a class="viewcode-back" href="../../libem.html#em.event.EventConf">[docs]</a><span class="k">class</span> <span class="nc">EventConf</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Configuration of Event</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enabled</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">subtype</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        :param enabled:</span>
+<span class="sd">        :type enabled: bool</span>
+<span class="sd">        :param name:</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        :param event_type:</span>
+<span class="sd">        :type event_type: str</span>
+<span class="sd">        :param subtype:</span>
+<span class="sd">        :type subtype: str</span>
+<span class="sd">        :param directory:</span>
+<span class="sd">        :type directory: str</span>
+<span class="sd">        :param patterns:</span>
+<span class="sd">        :type patterns: list of str</span>
+<span class="sd">        :param destination:</span>
+<span class="sd">        :type destination: str</span>
+<span class="sd">        :param context: Context of event</span>
+<span class="sd">        :type context: dict</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="n">enabled</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">event_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">=</span> <span class="n">subtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span> <span class="o">=</span> <span class="n">patterns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+
+<div class="viewcode-block" id="EventConf.is_scheduled"><a class="viewcode-back" href="../../libem.html#em.event.EventConf.is_scheduled">[docs]</a>    <span class="k">def</span> <span class="nf">is_scheduled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event is scheduled</span>
+
+<span class="sd">        :return: True if the event is cheduled</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;schedule&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">get_cron</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;cron&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_max_time_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;maxTimeExecution&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_max_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_context_value</span><span class="p">(</span><span class="s2">&quot;maxExecutions&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_context_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">default_value</span>
+
+<div class="viewcode-block" id="EventConf.is_fs_directory"><a class="viewcode-back" href="../../libem.html#em.event.EventConf.is_fs_directory">[docs]</a>    <span class="k">def</span> <span class="nf">is_fs_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the event use a linux fs directory</span>
+
+<span class="sd">        :return: True if the event use a linux fs directory</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;hdfs&quot;</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">!=</span> <span class="n">HDFSHandler</span><span class="o">.</span><span class="n">STR_TYPE_GET</span> <span class="ow">and</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">!=</span> <span class="n">HDFSHandler</span><span class="o">.</span><span class="n">TYPE_GET</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EventLoader"><a class="viewcode-back" href="../../libem.html#em.event.EventLoader">[docs]</a><span class="k">class</span> <span class="nc">EventLoader</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Events Loader</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="EventLoader.load_event_from_json"><a class="viewcode-back" href="../../libem.html#em.event.EventLoader.load_event_from_json">[docs]</a>    <span class="k">def</span> <span class="nf">load_event_from_json</span><span class="p">(</span><span class="n">json_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load events from Json</span>
+
+<span class="sd">        :param json_file: Filename of json</span>
+<span class="sd">        :type json_file: str</span>
+<span class="sd">        :return: List of Events</span>
+<span class="sd">        :rtype: dict of EventConf</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">j_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">j_file</span><span class="p">)</span>
+        <span class="n">event_list</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">json_data</span><span class="p">[</span><span class="s2">&quot;events&quot;</span><span class="p">]:</span>
+            <span class="n">enabled</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">]</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="n">event_type</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+            <span class="n">subtype</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;subtype&quot;</span><span class="p">]</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span>
+            <span class="n">patterns</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;filePatterns&quot;</span><span class="p">]</span>
+            <span class="n">destination</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]</span>
+            <span class="n">exec_program</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;execProgram&quot;</span><span class="p">]</span>
+            <span class="n">exec_args</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;execArgs&quot;</span><span class="p">]</span>
+            <span class="n">hdfs_url</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;hdfsUrl&quot;</span><span class="p">]</span>
+            <span class="n">hdfs_user</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;hdfsUser&quot;</span><span class="p">]</span>
+            <span class="n">event_list</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EventConf</span><span class="p">(</span><span class="n">enabled</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">subtype</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">event_list</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Cedric GUADALUPE.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

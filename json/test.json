@@ -1,0 +1,97 @@
+{
+  "events": [
+    {
+      "enabled": 1,
+      "name": "Test archive",
+      "filePatterns": ["test_????.txt"],
+      "directory": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\in",
+      "type": "fs",
+      "subtype": "archive",
+      "destination": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\in",
+      "execProgram": "",
+      "execArgs": "",
+      "hdfsUrl": "",
+      "hdfsUser": ""
+    },
+    {
+      "enabled": 1,
+      "name": "Test compresse",
+      "filePatterns": ["test_????.txt.tar"],
+      "directory": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\in",
+      "type": "fs",
+      "subtype": "compress",
+      "destination": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "execProgram": "",
+      "execArgs": "",
+      "hdfsUrl": "",
+      "hdfsUser": ""
+    },
+    {
+      "enabled": 1,
+      "name": "Test uncompresse",
+      "filePatterns": ["test_????.txt.tar.gz"],
+      "directory": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "type": "fs",
+      "subtype": "uncompress",
+      "destination": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "execProgram": "",
+      "execArgs": "",
+      "hdfsUrl": "",
+      "hdfsUser": ""
+    },
+    {
+      "enabled": 1,
+      "name": "Test unarchive",
+      "filePatterns": ["test_????.txt.tar"],
+      "directory": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "type": "fs",
+      "subtype": "unarchive",
+      "destination": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "execProgram": "",
+      "execArgs": "",
+      "hdfsUrl": "",
+      "hdfsUser": ""
+    },
+    {
+      "enabled": 1,
+      "name": "Test compression",
+      "filePatterns": ["test_????.txt"],
+      "directory": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "type": "fs",
+      "subtype": "compress",
+      "destination": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "execProgram": "",
+      "execArgs": "",
+      "hdfsUrl": "",
+      "hdfsUser": ""
+    },
+    {
+      "enabled": 1,
+      "name": "Test put hdfs",
+      "filePatterns": ["test_????.txt.gz"],
+      "directory": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out",
+      "type": "hdfs",
+      "subtype": "put",
+      "destination": "/user/hduser",
+      "execProgram": "",
+      "execArgs": "",
+      "hdfsUrl": "http://192.168.1.24:50070",
+      "hdfsUser": "hduser"
+    },
+    {
+      "enabled": 1,
+      "schedule": true,
+      "cron": "* * * * *",
+      "name": "Test get hdfs",
+      "filePatterns": ["test_????.txt.gz"],
+      "directory": "/user/hduser",
+      "type": "hdfs",
+      "subtype": "get",
+      "destination": "D:\\Users\\Cedric\\PycharmProjects\\event-manager\\rep_test\\out_hdfs",
+      "execProgram": "",
+      "execArgs": "",
+      "hdfsUrl": "http://192.168.1.24:50070",
+      "hdfsUser": "hduser"
+    }
+  ]
+}
